@@ -81,13 +81,13 @@
             <h2 id="headSub">SIGNATURES CAMPAIGN</h2>
             <p id="headDesc">In support of Secunderabad Cantonment Board merger into Municipal Corporation</p>
         </div>
-        <img src="https://i.ibb.co/5CHnQ1Q/1000029205.jpg" class="banner-img">
+        <img src="https://image2url.com/r2/default/images/1769868903883-1c3217eb-6d29-4e69-acb7-f6e204c21de3.jpeg" class="banner-img">
     </div>
 
     <div class="carousel-container">
         <div class="carousel-slide" id="slideTrack">
-            <div class="carousel-item"><img src="https://i.ibb.co/zhhgSH0T/1000029211.jpg"></div>
-            <div class="carousel-item"><img src="https://i.ibb.co/5CHnQ1Q/1000029205.jpg"></div>
+            <div class="carousel-item"><img src="https://image2url.com/r2/default/images/1769868787484-6f585762-45f0-4c74-a1de-7fb6e94b08fa.jpeg"></div>
+            <div class="carousel-item"><img src="https://image2url.com/r2/default/images/1769868903883-1c3217eb-6d29-4e69-acb7-f6e204c21de3.jpeg"></div>
         </div>
         <button class="nav-btn prev" onclick="move(-1)">&#10094;</button>
         <button class="nav-btn next" onclick="move(1)">&#10095;</button>
@@ -155,14 +155,50 @@
         function move(n) { document.getElementById('slideTrack').style.transform = `translateX(-${(cur = (cur + n + 2) % 2) * 100}%)`; }
         setInterval(() => move(1), 5000);
 
-        async function fetchSupporters() {
-            try {
-                const res = await fetch('/api/supporters');
-                const data = await res.json();
-                document.getElementById('totalCount').innerText = data.count || 0;
-                document.getElementById('supporterList').innerHTML = data.supporters.map(s => `<li><strong>${s.name}</strong> from ${s.locality}</li>`).join('');
-            } catch (err) { console.log("API offline."); }
+     async function fetchSupporters() {
+    try {
+        // 1. Fetch latest 10 supporters ordered by date
+        const listUrl = 'https://ujdaqscthobdecscfxcm.supabase.co/rest/v1/supporters?select=name,locality&order=created_at.desc&limit=10';
+        
+        const response = await fetch(listUrl, {
+            headers: {
+                'apikey': 'sb_publishable_YIg94KBYFQQKJJwNSjj_iw_IukxmKz9',
+                'Authorization': 'Bearer sb_publishable_YIg94KBYFQQKJJwNSjj_iw_IukxmKz9'
+            }
+        });
+
+        const supporters = await response.json();
+
+        // 2. Fetch total count (using a light query with count header)
+        const countResponse = await fetch('https://ujdaqscthobdecscfxcm.supabase.co/rest/v1/supporters?select=id', {
+            method: 'HEAD', // Light request just for headers
+            headers: {
+                'apikey': 'sb_publishable_YIg94KBYFQQKJJwNSjj_iw_IukxmKz9',
+                'Authorization': 'Bearer sb_publishable_YIg94KBYFQQKJJwNSjj_iw_IukxmKz9',
+                'Prefer': 'count=exact'
+            }
+        });
+
+        // Extract total count from the 'content-range' header (e.g., "0-9/1420")
+        const contentRange = countResponse.headers.get('content-range');
+        const totalCount = contentRange ? contentRange.split('/')[1] : 0;
+
+        // 3. Update UI
+        document.getElementById('totalCount').innerText = totalCount;
+        
+        const listElement = document.getElementById('supporterList');
+        if (supporters.length > 0) {
+            listElement.innerHTML = supporters
+                .map(s => `<li><strong>${s.name}</strong> from ${s.locality}</li>`)
+                .join('');
+        } else {
+            listElement.innerHTML = "<li>Be the first to pledge!</li>";
         }
+
+    } catch (err) {
+        console.error("Supabase fetch failed:", err);
+    }
+}
 
         function updateUI() {
             const l = ui[document.getElementById('lang').value];
@@ -195,17 +231,41 @@
         ['name', 'res', 'lang'].forEach(id => document.getElementById(id).addEventListener('input', updateUI));
         window.onload = () => { updateUI(); fetchSupporters(); };
 
-        document.getElementById('pledgeForm').addEventListener('submit', async (e) => {
+            document.getElementById('pledgeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const data = { name: document.getElementById('name').value, locality: document.getElementById('res').value };
+        
+            const formData = {  
+                                name: document.getElementById('name').value, locality: document.getElementById('res').value,
+                                mobile: document.getElementById('mobile').value, email: document.getElementById('email').value,
+                                lang: document.getElementById('lang').value
+                            };
 
             try {
-                await fetch('/api/pledge', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
-            } catch (err) { console.log("Saving locally."); }
+                    const response = await fetch('https://ujdaqscthobdecscfxcm.supabase.co/rest/v1/supporters', {
+                        method: 'POST',
+                        headers: {
+                            'apikey': 'sb_publishable_YIg94KBYFQQKJJwNSjj_iw_IukxmKz9',
+                            'Authorization': 'Bearer sb_publishable_YIg94KBYFQQKJJwNSjj_iw_IukxmKz9',
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=representation'
+                        },
+                        body: JSON.stringify(formData) // Ensure formData matches your table columns
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error("Supabase Error:", errorData);
+                        throw new Error("Pledge submission failed");
+                    }
+
+                    console.log("Pledge saved successfully!");
+                } catch (err) {
+                    console.log("Connection failed or Error occurred. Saving locally.");
+                }
 
             html2canvas(document.getElementById('captureArea'), { scale: 2 }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `Pledge_${data.name}.png`;
+                link.download = `Pledge_${formData.name}.png`;
                 link.href = canvas.toDataURL("image/png");
                 link.click();
             });
