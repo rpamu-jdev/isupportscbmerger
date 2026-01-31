@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>401 - Unauthorized Access</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 flex items-center justify-center min-h-screen font-sans">
+
+    <div class="max-w-lg w-full text-center px-8 py-12 bg-white shadow-xl rounded-2xl border border-gray-100">
+        <div class="mb-6 flex justify-center">
+            <div class="p-4 bg-amber-50 rounded-full text-amber-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+            </div>
+        </div>
+
+        <h1 class="text-4xl font-black text-slate-900 mb-2 tracking-tight">Access Denied</h1>
+        <p class="text-slate-500 mb-8 px-4">
+            You are not authorized to access this resource. If you believe this is an error or need access, please reach out to the technical team.
+        </p>
+
+        <div class="py-6 bg-slate-50 rounded-xl border border-dashed border-slate-200 mb-8">
+            <p class="text-sm text-slate-600 mb-2">Technical Support</p>
+            <a href="mailto:dev-support@example.com" class="text-lg font-bold text-indigo-600 hover:text-indigo-700 transition flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                Contact Developer
+            </a>
+        </div>
+
+        <a href="/" class="text-slate-500 hover:text-slate-800 text-sm font-medium transition flex items-center justify-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Home
+        </a>
+
+        <div class="mt-12 text-[10px] uppercase tracking-widest text-slate-400">
+            Error Code: 401_UNAUTHORIZED | Ref: <span id="ref-id">#8821-XP</span>
+        </div>
+    </div>
+
+</body>
+</html>
